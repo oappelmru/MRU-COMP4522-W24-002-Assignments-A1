@@ -12,12 +12,38 @@ transactions = [['1', 'Department', 'Music'], ['5', 'Civil_status', 'Divorced'],
                 ['15', 'Salary', '200000']]
 DB_Log = [] # <-- You WILL populate this as you go
 
+
+# Status constants
+
 def recovery_script(log:list):  #<--- Your CODE
     '''
     Restore the database to stable and sound condition, by processing the DB log.
     '''
     print("Calling your recovery script with DB_Log as an argument.")
     print("Recovery in process ...\n")
+
+    global data_base
+
+   
+    for transaction in log:
+        transaction_id, attribute, old_value, new_value = transaction
+
+        # Undo (Rollback)
+        for record in data_base:
+            if record[0] == transaction_id and record[1] == attribute:
+                record[2] = old_value
+                break
+        #do it again
+        for record in data_base:
+            if record[0] == transaction_id and record[1] == attribute:
+                record[2] = new_value
+                break
+
+   
+    print("Recovery successful! Changes committed.")
+
+    log.clear()
+   
     pass
 
 def transaction_processing(): #<-- Your CODE
@@ -26,6 +52,28 @@ def transaction_processing(): #<-- Your CODE
     2. Updates DB_Log accordingly
     3. This function does NOT commit the updates, just execute them
     '''
+
+    global data_base
+    global transactions
+    global DB_Log
+
+    for transaction in transactions:
+        transaction_id, attribute, new_value = transaction
+
+       
+        record = next((record for record in data_base if record[0] == transaction_id and record[1] == attribute), None)
+
+        if record:
+            
+            old_value = record[2]
+            DB_Log.append([transaction_id, attribute, old_value, new_value])
+
+           
+            record[2] = new_value
+            print(f"Transaction processed: {transaction}")
+        else:
+            print(f"Record with ID {transaction_id} and attribute {attribute} not found.")
+
     pass
     
 
@@ -34,16 +82,14 @@ def read_file(file_name:str)->list:
     Read the contents of a CSV file line-by-line and return a list of lists
     '''
     data = []
-    #
-    # one line at-a-time reading file
-    #
+ 
     with open(file_name, 'r') as reader:
-    # Read and print the entire file line by line
+   
         line = reader.readline()
-        while line != '':  # The EOF char is an empty string
+        while line != '':  
             line = line.strip().split(',')
             data.append(line)
-             # get the next line
+          
             line = reader.readline()
 
     size = len(data)
@@ -74,6 +120,7 @@ def main():
         # Process transaction
         for index in range(number_of_transactions):
             print(f"\nProcessing transaction No. {index+1}.")    #<--- Your CODE (Call function transaction_processing)
+            transaction_processing()
             print("UPDATES have not been committed yet...\n")
             failure = is_there_a_failure()
             if failure:
@@ -95,7 +142,9 @@ def main():
     print('The data entries AFTER updates -and RECOVERY, if necessary- are presented below:')
     for item in data_base:
         print(item)
+
     
 main()
+
 
 
