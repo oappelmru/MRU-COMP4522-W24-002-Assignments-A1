@@ -2,8 +2,10 @@
 
 # test save 
 import random
+import csv 
 
 data_base = []  # Global binding for the Database contents
+
 '''
 transactions = [['id1',' attribute2', 'value1'], ['id2',' attribute2', 'value2'],
                 ['id3', 'attribute3', 'value3']]
@@ -79,18 +81,25 @@ def transaction_processing(): #<-- Your CODE
 
 def read_file(file_name:str)->list:
     '''
-    Read the contents of a CSV file line-by-line and return a list of lists
+    Read the contents of a CSV file line-by-line and return a new CSV file
     '''
     data = []
  
-    with open(file_name, 'r') as reader:
-   
-        line = reader.readline()
-        while line != '':  
-            line = line.strip().split(',')
-            data.append(line)
+    with open(file_name, 'r') as csv_file:
+        csv_reader = csv.reader(csv_file)
+
+        with open('NEW_EMP.csv','w') as new_file:
+            csv_writer = csv.writer(new_file, delimiter=',')
+
+            for line in csv_reader:
+                csv_writer.writerow(line)
+
+        # line = reader.readline()
+        # while line != '':  
+        #     line = line.strip().split(',')
+        #     data.append(line)
           
-            line = reader.readline()
+        #     line = reader.readline()
 
     size = len(data)
     print('The data entries BEFORE updates are presented below:')
@@ -113,7 +122,7 @@ def is_there_a_failure()->bool:
 def main():
     number_of_transactions = len(transactions)
     must_recover = False
-    data_base = read_file('Employees_DB_ADV.csv')
+    data_base = read_file('./CodeAndData/Employees_DB_ADV.csv')
     failure = is_there_a_failure()
     failing_transaction_index = None
     while not failure:
