@@ -227,44 +227,55 @@ def recovery_script(log: list):
 
     global data_base
 
-    for transaction in log:
-        transaction_id, attribute, old_value, new_value, state = transaction
+    for i in range(len(log)):
+        entry = log[i]
+        transaction_id, attribute, old_value, state = entry
 
-        # Undo (Rollback)
-        for record in data_base:
-            if record[0] == transaction_id and record[1] == attribute:
-                record[2] = old_value
-                record[-1] = ROLLED_BACK  # Update state to "rolled back"
+        if state == 'not committed':
+            record = next((record for record in data_base if record[0] == transaction_id and record[1] == attribute), None)
 
+            if record:
+                update_database(data_base, transaction_id, attribute, old_value)
+                log[i] = (transaction_id,attribute, old_value, 'rolled-back')
+    new_file_name = 'Logging.csv'
+    with open(new_file_name, 'w', newline='') as writer:
+        csv_writer = csv.writer(writer)
+        csv_writer.writerow(['Unique_ID', 'Category', 'New_Value', 'Status'])
+        csv_writer.writerows(log)
+                    
     print("Recovery successful! Changes committed.")
+
 
     log.clear()
 
-def transaction_processing():
+def transaction_processing(transactions):
     '''
     1. Process transaction in the transaction queue.
     2. Updates DB_Log accordingly
     3. This function does NOT commit the updates, just execute them
     '''
-
     global data_base
-    global transactions
+    
     global DB_Log
 
     for transaction in transactions:
-        transaction_id, attribute, new_value = transaction
+        unique_id, category, value = transaction
 
-        record = next((record for record in data_base if record[0] == transaction_id and record[1] == attribute), None)
-
-        if record:
-            old_value = record[2]
-            DB_Log.append([transaction_id, attribute, old_value, new_value, NOT_COMMITTED])
-
-            record[2] = new_value
-            record[-1] = NOT_COMMITTED  # Update state to "not-committed"
-            print(f"Transaction processed: {transaction}")
+        if unique_id == '1' and category == 'Department':
+            # Update the value in DB_Log
+            DB_Log.append((unique_id, category, value, 'not committed'))
+        elif unique_id == '5' and category == 'Civil_status':
+            # Update the value in DB_Log
+            DB_Log.append((unique_id, category, value, 'not committed'))
+        elif unique_id == '15' and category == 'Salary':
+            # Update the value in DB_Log
+            DB_Log.append((unique_id, category, value, 'not committed'))
         else:
-            print(f"Record with ID {transaction_id} and attribute {attribute} not found.")
+            # Log the transaction with a default status of 'not committed'
+            DB_Log.append((unique_id, category, value, 'not committed'))
+
+    # Print the updated DB_Log for demonstration purposes
+    print("Updated DB_Log:", DB_Log)
 
 def read_file(file_name: str) -> list:
     '''
@@ -277,6 +288,7 @@ def read_file(file_name: str) -> list:
 
         for line in csv_reader:
             data.append(line + [NOT_COMMITTED])  # Initialize state as "not-committed"
+            print(line)
 
     size = len(data)
     print('The data entries BEFORE updates are presented below:')
@@ -296,7 +308,15 @@ def is_there_a_failure() -> bool:
         result = False
     return result
 
+def update_database(database, unique_id, category, new_value):
+    '''Update the data_base list with the changes'''
+    for entry in database:
+        if entry[0] == unique_id and entry[1] == category:
+            entry[2] = new_value
+            break
+
 def main():
+    global data_base
     number_of_transactions = len(transactions)
     must_recover = False
     data_base = read_file('./CodeAndData/Employees_DB_ADV.csv')
@@ -307,7 +327,7 @@ def main():
         # Process transaction
         for index in range(number_of_transactions):
             print(f"\nProcessing transaction No. {index + 1}.")
-            transaction_processing()
+            transaction_processing([transactions[index]])
             print("UPDATES have not been committed yet...\n")
             failure = is_there_a_failure()
             if failure:
@@ -317,13 +337,21 @@ def main():
                 break
             else:
                 print(f'Transaction No. {index + 1} has been committed! Changes are permanent.')
-
+                for i in range(len(DB_Log)):
+                    entry = DB_Log[i]
+                    unique_id, category, new_value, status = entry
+                    if failure == False and status == 'not committed':
+                        update_database(data_base, unique_id, category, new_value)
+                        DB_Log[i] = (unique_id, category, new_value, 'committed')
+    
     if must_recover:
-        # Call your recovery script
         recovery_script(DB_Log)
+
+        print("Rollback completed successfully.\n") ### Call the recovery function to restore DB to sound state
 
     else:
         # All transactions ended up well
+        
         print("All transaction ended up well.")
         print("Updates to the database were committed!\n")
 
@@ -333,9 +361,14 @@ def main():
         csv_writer.writerow(['Unique_ID', 'First_name', 'Last_name', 'Salary', 'Department', 'Civil_status', 'State'])
         csv_writer.writerows(data_base)
 
+   
+        
+
     print('The data entries AFTER updates -and RECOVERY, if necessary- are presented below:')
     for item in data_base:
         print(item)
+
+  
 
 main()
 
