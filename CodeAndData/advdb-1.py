@@ -233,7 +233,8 @@ def recovery_script(log: list):
 
         if state == 'not committed':
             record = next((record for record in data_base if record[0] == transaction_id and record[1] == attribute), None)
-
+            update_database(data_base, transaction_id, attribute, old_value)
+            log[i] = (transaction_id,attribute, old_value, 'rolled-back')
             if record:
                 update_database(data_base, transaction_id, attribute, old_value)
                 log[i] = (transaction_id,attribute, old_value, 'rolled-back')
