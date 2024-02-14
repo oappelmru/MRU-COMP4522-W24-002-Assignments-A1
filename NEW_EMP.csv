@@ -1,0 +1,17 @@
+Unique_ID,First_name,Last_name,Salary,Department,Civil_status,State
+Unique_ID,First_name,Last_name,Salary,Department,Civil_status,not-committed
+1,John,Lennon,230000,Projects,Married,not-committed
+2,Joan,Doe,100000,Human Resources,Single,not-committed
+3,Mary,Carpenter,250000,Projects,Separated,not-committed
+4,John,Ingham,125000,Projects,Separated,not-committed
+5,Rachel,Sturgeon,197000,Engineering,Married,not-committed
+6,Hanifa,Salima,50000,Engineering,Married,not-committed
+7,Femi,Okeke,425000,Industries,Married,not-committed
+8,Moe,Khalifa,325000,Industries,Married,not-committed
+9,Katy,Jones,475000,Management,Single,not-committed
+10,Lin,Wang,435000,Engineering,Married,not-committed
+11,Art,Blanket,137000,Projects,Single,not-committed
+12,Vivek,Singh,231000,Industries,Married,not-committed
+13,Amal,Khan,230000,Projects,Single,not-committed
+14,Richard,Carpenter,123000,Human Resources,Single,not-committed
+15,Ryuichi,Sakamoto,321000,Processing Facilities,Single,not-committed
