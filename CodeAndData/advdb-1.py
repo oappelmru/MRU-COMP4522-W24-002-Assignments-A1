@@ -278,6 +278,7 @@ def transaction_processing(transactions):
     # Print the updated DB_Log for demonstration purposes
     print("Updated DB_Log:", DB_Log)
 
+
 def read_file(file_name: str) -> list:
     '''
     Read the contents of a CSV file line-by-line and return a new CSV file
