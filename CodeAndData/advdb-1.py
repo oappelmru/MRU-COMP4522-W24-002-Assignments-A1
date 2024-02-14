@@ -217,6 +217,7 @@ DB_Log = []  # You WILL populate this as you go
 # Status constants
 NOT_COMMITTED = "not-committed"
 ROLLED_BACK = "rolled back"
+COMMITTED = "committed"
 
 def recovery_script(log: list):
     '''

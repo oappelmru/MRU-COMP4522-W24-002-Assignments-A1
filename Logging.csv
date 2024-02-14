@@ -1,2 +1,4 @@
 Unique_ID,Category,New_Value,Status
-1,Department,Music,rolled-back
+1,Department,Music,committed
+5,Civil_status,Divorced,committed
+15,Salary,200000,rolled-back
